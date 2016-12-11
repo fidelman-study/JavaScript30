@@ -9,8 +9,8 @@
 
 <div class="clock">
     <div class="clock-face">
-        <div class="hand hour-hand"></div>
         <div class="hand min-hand"></div>
+        <div class="hand hour-hand"></div>
         <div class="hand second-hand"></div>
     </div>
 </div>
@@ -56,16 +56,112 @@
     }
 
     .hand {
-        width:50%;
-        height:6px;
-        background:black;
         position: absolute;
         top:50%;
+        /**/
+        transform-origin: 100%;
+        transform: rotate(90deg);
+        transition: all .05s;
+        transition-timing-function: cubic-bezier(0.1, 2.7, 0.58, 1);
     }
+
+    .hour-hand {
+        width:35%;
+        height:6px;
+        left: 15%;
+    }
+
+    .hour-hand,
+    .min-hand {
+        background:black;
+    }
+
+    .min-hand {
+        width:50%;
+        height:4px;
+    }
+
+    .second-hand {
+        background:red;
+        width:50%;
+        height:2px;
+    }
+
+    .second-hand:before,
+    .min-hand:before,
+    .hour-hand:before {
+        content: '';
+        width: 0;
+        height: 0;
+        position: absolute;
+    }
+
+    .hour-hand:before {
+        border-right: 6px solid black;
+        border-top: 3px solid transparent;
+        border-bottom: 3px solid transparent;
+        left: -6px;
+    }
+
+    .min-hand:before {
+        border-right: 4px solid black;
+        border-top: 2px solid transparent;
+        border-bottom: 2px solid transparent;
+        left: -4px;
+    }
+
+    .second-hand:before {
+        border-right: 2px solid red;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+        left: -2px;
+    }
+
+
 
 </style>
 
 <script>
+
+    const hourHand = document.querySelector('.hour-hand');
+    const minHand = document.querySelector('.min-hand');
+    const secondHand = document.querySelector('.second-hand');
+
+    function setDate() {
+        secondHand.style.transform = getTimeRotate('seconds');
+        minHand.style.transform =  getTimeRotate('mins');
+        hourHand.style.transform = getTimeRotate('hours');
+
+    }
+
+    const getTimeRotate = type => {
+        const now = new Date();
+
+        let timeData = { type };
+        switch (type) {
+            case 'hours':
+                timeData.time = now.getHours();
+                break;
+            case 'mins':
+                timeData.time = now.getMinutes();
+                break;
+            case 'seconds':
+                timeData.time = now.getSeconds();
+                break;
+            default:
+                console.error('Type must be hours or mins or seconds');
+                break;
+        }
+        return `rotate(${inDegree(timeData)}deg)`;
+    };
+
+    const inDegree = (timeData) => {
+        const { time, type } = timeData;
+        const maxPerCircle = (type == 'hours') ? 12 : 60;
+        return ((time / maxPerCircle) * 360) + 90;
+    };
+
+    setInterval(setDate, 1000);
 
 
 </script>
